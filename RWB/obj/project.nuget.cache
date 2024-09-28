@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "XlvTAEzxKOjtA0tyCG+dahG8XrXySY7G/9CXas62pNxbJJWNACGKgTZ5rR60X+Nx0C6p7yctiS9UolKE3npuEw==",
+  "dgSpecHash": "t9nBpdor+cV5kPsSqyPUfyarnezhd3pRn1dGDo+9L59XQMFkSBrMCKfRdIdXXyhKMtSHmAA2mov+PmKysx6S/g==",
   "success": true,
-  "projectFilePath": "/home/kali/MyGtkApp/MyGtkApp.fsproj",
+  "projectFilePath": "/home/kali/RWB/MyGtkApp.fsproj",
   "expectedPackageFiles": [
     "/root/.nuget/packages/atksharp/3.24.24.95/atksharp.3.24.24.95.nupkg.sha512",
     "/root/.nuget/packages/cairosharp/3.24.24.95/cairosharp.3.24.24.95.nupkg.sha512",

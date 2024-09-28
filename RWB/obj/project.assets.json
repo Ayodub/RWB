@@ -305,11 +305,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/kali/MyGtkApp/MyGtkApp.fsproj",
+      "projectUniqueName": "/home/kali/RWB/MyGtkApp.fsproj",
       "projectName": "MyGtkApp",
-      "projectPath": "/home/kali/MyGtkApp/MyGtkApp.fsproj",
+      "projectPath": "/home/kali/RWB/MyGtkApp.fsproj",
       "packagesPath": "/root/.nuget/packages/",
-      "outputPath": "/home/kali/MyGtkApp/obj/",
+      "outputPath": "/home/kali/RWB/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/root/.nuget/NuGet/NuGet.Config"
