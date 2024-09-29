@@ -20,7 +20,7 @@
           "net6.0"
         ],
         "sources": {
-          "/usr/share/dotnet/sdk/6.0.400/FSharp/library-packs": {},
+          "/usr/share/dotnet/sdk/7.0.404/FSharp/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +37,7 @@
             "FSharp.Core": {
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
-              "version": "[6.0.5, )",
+              "version": "[7.0.402, )",
               "generatePathProperty": true
             },
             "GtkSharp": {
@@ -60,15 +60,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.8, 6.0.8]"
+              "version": "[6.0.25, 6.0.25]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.linux-x64",
-              "version": "[6.0.8, 6.0.8]"
+              "version": "[6.0.25, 6.0.25]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[6.0.8, 6.0.8]"
+              "version": "[6.0.25, 6.0.25]"
             }
           ],
           "frameworkReferences": {
@@ -76,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.400/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.404/RuntimeIdentifierGraph.json"
         }
       }
     }

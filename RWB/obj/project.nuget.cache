@@ -1,20 +1,20 @@
 {
   "version": 2,
-  "dgSpecHash": "t9nBpdor+cV5kPsSqyPUfyarnezhd3pRn1dGDo+9L59XQMFkSBrMCKfRdIdXXyhKMtSHmAA2mov+PmKysx6S/g==",
+  "dgSpecHash": "xyPAD+yaAC2xnSP8tiADoq66cMz8+vGcmNT/OQV5GyKVxC81VJKvXtJhZA2+YIugGULCJtCANmbqtkRwW6gwMw==",
   "success": true,
   "projectFilePath": "/home/kali/RWB/MyGtkApp.fsproj",
   "expectedPackageFiles": [
     "/root/.nuget/packages/atksharp/3.24.24.95/atksharp.3.24.24.95.nupkg.sha512",
     "/root/.nuget/packages/cairosharp/3.24.24.95/cairosharp.3.24.24.95.nupkg.sha512",
-    "/root/.nuget/packages/fsharp.core/6.0.5/fsharp.core.6.0.5.nupkg.sha512",
+    "/root/.nuget/packages/fsharp.core/7.0.402/fsharp.core.7.0.402.nupkg.sha512",
     "/root/.nuget/packages/gdksharp/3.24.24.95/gdksharp.3.24.24.95.nupkg.sha512",
     "/root/.nuget/packages/giosharp/3.24.24.95/giosharp.3.24.24.95.nupkg.sha512",
     "/root/.nuget/packages/glibsharp/3.24.24.95/glibsharp.3.24.24.95.nupkg.sha512",
     "/root/.nuget/packages/gtksharp/3.24.24.95/gtksharp.3.24.24.95.nupkg.sha512",
     "/root/.nuget/packages/pangosharp/3.24.24.95/pangosharp.3.24.24.95.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.netcore.app.ref/6.0.8/microsoft.netcore.app.ref.6.0.8.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.8/microsoft.aspnetcore.app.ref.6.0.8.nupkg.sha512",
-    "/root/.nuget/packages/microsoft.netcore.app.host.linux-x64/6.0.8/microsoft.netcore.app.host.linux-x64.6.0.8.nupkg.sha512"
+    "/root/.nuget/packages/microsoft.netcore.app.ref/6.0.25/microsoft.netcore.app.ref.6.0.25.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.25/microsoft.aspnetcore.app.ref.6.0.25.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.netcore.app.host.linux-x64/6.0.25/microsoft.netcore.app.host.linux-x64.6.0.25.nupkg.sha512"
   ],
   "logs": []
 }
